@@ -22,21 +22,22 @@ from quadtree import Quadtree
 
 
 if __name__ == '__main__':
-    # parse cli arguments
+    # parse cli arguments (nargs='?' => optional parameter)
     parser = argparse.ArgumentParser()
     parser.add_argument('path_image', help='Path to input image')
+    parser.add_argument('n_levels', nargs='?', type=int, default=7, help='Number of levels in the quadtree')
+    parser.add_argument('level', nargs='?', type=int, default=6, help='Level of image to show')
     args = parser.parse_args()
 
     # quadtree from image
     # img_in = mpimg.imread('assets/synthetic.png')
     img_in = mpimg.imread(args.path_image)
     logger.info('Input image: {}'.format(img_in.shape))
-    quadtree = Quadtree(img_in, nlevels=7)
+    quadtree = Quadtree(img_in, nlevels=args.n_levels)
 
     # dfs traversal of quadtree till given level
     nodes_level = []
-    level = 7
-    quadtree.traverse(quadtree.root, level=level, nodes=nodes_level)
+    quadtree.traverse(quadtree.root, level=args.level, nodes=nodes_level)
     n_nodes = len(nodes_level)
     logger.info('Nodes @level: {}'.format(n_nodes))
 
@@ -46,6 +47,9 @@ if __name__ == '__main__':
         get_attrs = operator.attrgetter('row', 'col', 'nrows', 'ncols')
         row, col, nrows, ncols =  get_attrs(node)
         img_out[row:row+nrows, col:col+ncols] = node.image
+
+    # important to convert to ints (otherwise floats must be in [0, 1], not case with avg.)
+    img_out = img_out.astype(int)
 
     # show input & output images
     figs, ax = plt.subplots(1, 2)

@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 import numpy as np
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 def split(image):
     """
@@ -26,4 +30,8 @@ def average(image):
     """
     Average color for each quadrant
     """
-    return np.mean(image.reshape([-1, 4]), axis=0)
+    # turn image into a 3d/4d vector (accord. to n_channels)
+    n_channels = image.shape[-1]
+    avg = np.mean(image.reshape([-1, n_channels]), axis=0)
+
+    return avg
